@@ -4,6 +4,7 @@ import { AccountsHandler } from "./accounts/accounts";
 import { FinancialManager } from "./Financial/financial";
 import { EventsHandler } from "./Events/events"; // Importar o EventsHandler
 
+
 const port = 3000;
 const app = express();
 const routes = Router();
@@ -21,7 +22,14 @@ routes.get('/', (req: Request, res: Response) => {
 app.post('/register', AccountsHandler.registerHandler);
 app.post('/login', AccountsHandler.loginHandler);
 app.post('/getWalletBalance', FinancialManager.getWalletBalanceHandler);
-app.post("/addNewEvent", EventsHandler.addNewEvent); // Adicionar a nova rota
+
+// Rota para adicionar um novo evento (usuários comuns)
+app.post("/addNewEvent", EventsHandler.addNewEvent);
+
+// Rota para moderar um evento (admin)
+app.post("/moderateEvent", EventsHandler.moderateEvent);
+
+// Rota de teste
 app.post("/test", (req, res) => {
     console.log(req.body); // Verifique se o corpo está chegando
     res.send("Recebido!");

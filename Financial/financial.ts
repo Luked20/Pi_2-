@@ -55,10 +55,11 @@ export namespace FinancialManager {
 
     
     export const withdrawFunds = async (req: Request, res: Response): Promise<void> => {
-        const { user_id, amount } = req.body;
+        const { user_id, amount, account_number } = req.body; // account_number é a conta corrente para a qual o valor será transferido
     
-        if (!user_id || !amount || amount <= 0) {
-            res.status(400).json({ message: 'userId e amount são obrigatórios e amount deve ser maior que 0.' });
+        // Verificar se user_id, amount e account_number estão presentes
+        if (!user_id || !amount || amount <= 0 || !account_number) {
+            res.status(400).json({ message: 'user_id, amount e account_number são obrigatórios e amount deve ser maior que 0.' });
             return;
         }
     
@@ -67,14 +68,15 @@ export namespace FinancialManager {
         try {
             connection = await connectToDatabase();
     
-            // Adicione o console.log para depuração
-            console.log(`Tentando retirar fundos. user_id: ${user_id}, amount: ${amount}`);
+            console.log(`Tentando sacar fundos. user_id: ${user_id}, amount: ${amount}, account_number: ${account_number}`);
     
             // Verificar o saldo total do usuário
-            const fundsResult = await connection.execute<FundsResult>(
-                `SELECT SUM(amount) AS TOTALFUNDS FROM FUNDS WHERE user_id = :user_id`,
+            const fundsResult = await connection.execute<{ TOTALFUNDS: number }>(
+                `SELECT SUM(amount) FROM FUNDS WHERE user_id = :user_id`,
                 [user_id]
             );
+    
+            console.log('Resultado da consulta de fundos:', fundsResult);
     
             // Verifique se fundsResult e rows estão definidos
             if (!fundsResult || !fundsResult.rows || fundsResult.rows.length === 0) {
@@ -82,11 +84,9 @@ export namespace FinancialManager {
                 return;
             }
     
-            // Obtenha o saldo total do usuário
-            const totalFunds = fundsResult.rows[0].TOTALFUNDS || 0;
+            const totalFunds = fundsResult.rows[0] || 0; // Obter o saldo total ou 0 se não houver
     
-            // Adicione um console.log para verificar o saldo total encontrado
-            console.log(`Saldo total encontrado: ${totalFunds}`);
+            console.log('TOTALFUNDS encontrado:', totalFunds);
     
             // Verifique se o saldo é suficiente
             if (totalFunds < amount) {
@@ -95,6 +95,7 @@ export namespace FinancialManager {
             }
     
             // Realizar a retirada
+            // Inserir um registro de retirada com valor negativo
             await connection.execute(
                 `INSERT INTO FUNDS (user_id, amount) VALUES (:user_id, :amount)`,
                 {
@@ -104,10 +105,16 @@ export namespace FinancialManager {
                 { autoCommit: true }
             );
     
+            // Aqui você pode adicionar a lógica para transferir o valor para a conta corrente
+            // Por exemplo, você poderia ter uma função chamada transferFunds que lida com essa lógica.
+    
+            // Simulando a transferência (substitua isso pela lógica real)
+            console.log(`Transferindo ${amount} para a conta ${account_number}.`);
+    
             res.json({ message: 'Retirada realizada com sucesso!' });
         } catch (error) {
             console.error('Erro ao tentar sacar fundos:', error);
-            res.status(500).json({ message: 'Erro ao sacar fundos.' });
+            res.status(500).json({ message: 'Erro ao processar a retirada de fundos.' });
         } finally {
             // Certifique-se de fechar a conexão se ela estiver aberta
             if (connection) {

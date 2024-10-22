@@ -4,6 +4,8 @@ import { AccountsHandler } from "./accounts/accounts";
 import { FinancialManager } from "./Financial/financial";
 import { EventsHandler } from "./Events/events"; // Importar o EventsHandler
 
+
+
 const port = 3000;
 const app = express();
 const routes = Router();
@@ -17,17 +19,22 @@ routes.get('/', (req: Request, res: Response) => {
     res.send('Acesso não permitido. Rota default não disponível.');
 });
 
-// Rotas para gerenciar a conta
+
 app.post('/register', AccountsHandler.registerHandler);
 app.post('/login', AccountsHandler.loginHandler);
-app.post('/getWalletBalance', FinancialManager.getWalletBalanceHandler);
-app.post("/addNewEvent", EventsHandler.addNewEvent); // Adicionar a nova rota
+app.post('/addFunds', FinancialManager.addFunds);
+app.post('/withdrawFunds', FinancialManager.withdrawFunds);
+app.post("/addNewEvent", EventsHandler.addNewEvent);
+app.post("/evaluateEvent", EventsHandler.moderateEvent);
+app.delete("/deleteEvent", EventsHandler.deleteEvent);
+app.get('/searchEvents', EventsHandler.searchEvents);
+
 app.post("/test", (req, res) => {
     console.log(req.body); // Verifique se o corpo está chegando
     res.send("Recebido!");
 });
 
-// Usar as rotas definidas
+
 app.use(routes);
 
 // Iniciar o servidor

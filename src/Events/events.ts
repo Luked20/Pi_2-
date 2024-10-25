@@ -391,7 +391,7 @@ export const finishEvent = async (req: Request, res: Response): Promise<void> =>
         } else {
             // Distribui os ganhos proporcionalmente
             for (const winner of winningBets) {
-                const prize = (winner.amount / totalWinningAmount) * totalAmount;
+                const prize = ((winner.amount / totalWinningAmount) * totalAmount) * 1,5;
 
                 await connection.execute(`
                     UPDATE funds SET amount = amount + :prize WHERE user_id = :user_id

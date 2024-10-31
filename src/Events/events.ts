@@ -334,17 +334,29 @@ export const betOnEvent = async (req: Request, res: Response): Promise<void> => 
 interface Bet {
     user_id: number;
     amount: number;
-    statusBet: string; // ou outro tipo que você esteja usando
+    statusBet: string; 
 }
 
 export const finishEvent = async (req: Request, res: Response): Promise<void> => {
-    const { event_id }: { event_id: number } = req.body;
+    const { event_id, admin_id, winner } = req.body;
 
-    console.log("Finalizando evento:", { event_id });
+    console.log("Finalizando evento:", { event_id, admin_id, winner });
 
-    if (!event_id) {
-        console.error("Parâmetro obrigatório ausente:", { event_id });
-        res.status(400).json({ message: "ID do evento é obrigatório." });
+    if (!event_id || !admin_id || !winner) {
+        console.error("Parâmetros obrigatórios ausentes:", { event_id, admin_id, winner });
+        res.status(400).json({ message: "ID do evento, ID do admin e resultado são obrigatórios." });
+        return;
+    }
+
+    if (admin_id !== 110) {
+        console.error("Apenas o admin pode finalizar o evento.");
+        res.status(403).json({ message: "Acesso negado. Apenas o admin pode finalizar eventos." });
+        return;
+    }
+
+    if (winner !== 'yes' && winner !== 'no') {
+        console.error("Valor inválido para winner:", winner);
+        res.status(400).json({ message: "O resultado deve ser 'yes' ou 'no'." });
         return;
     }
 
@@ -354,60 +366,55 @@ export const finishEvent = async (req: Request, res: Response): Promise<void> =>
         connection = await connectToDatabase();
         console.log("Conexão com o banco de dados estabelecida.");
 
-        // Obtém apostas do banco de dados
         const betsResult = await connection.execute<Bet[]>(`
             SELECT user_id, amount, statusBet FROM bets WHERE event_id = :event_id
         `, { event_id });
 
-        // Verifica se betsResult.rows está definido e possui dados
         if (!betsResult.rows || !Array.isArray(betsResult.rows) || betsResult.rows.length === 0) {
             console.error("Nenhuma aposta encontrada para este evento.");
             res.status(404).json({ message: "Nenhuma aposta encontrada para este evento." });
             return;
         }
 
-        // Mapeia as apostas para garantir que estamos lidando com um array de objetos Bet corretamente
         const bets: Bet[] = betsResult.rows.map((row: any[]) => ({
-            user_id: Number(row[0]), // Converte user_id para número
-            amount: Number(row[1]),  // Converte amount para número
-            statusBet: String(row[2]) // Converte statusBet para string
+            user_id: Number(row[0]),
+            amount: Number(row[1]),
+            statusBet: String(row[2])
         }));
 
         console.log("Apostas encontradas:", bets);
 
-        // Filtra as apostas que têm statusBet "yes"
-        const winningBets: Bet[] = bets.filter(bet => bet.statusBet === 'yes');
+        const winningBets: Bet[] = bets.filter(bet => bet.statusBet === winner);
+        const losingBets: Bet[] = bets.filter(bet => bet.statusBet !== winner);
 
-        // Calcula o montante total apostado
         const totalAmount = bets.reduce((sum: number, bet: Bet) => sum + bet.amount, 0);
-        console.log("Montante total: ", totalAmount);
-
-        const totalWinningAmount = winningBets.reduce((sum: number, winner: Bet) => sum + winner.amount, 0);
+        const totalWinningAmount = winningBets.reduce((sum: number, winnerBet: Bet) => sum + winnerBet.amount, 0);
 
         if (winningBets.length === 0) {
             console.log("Nenhum vencedor para o evento.");
             res.json({ message: "Evento finalizado, mas não há vencedores." });
             return;
-        } else {
-            // Distribui os ganhos proporcionalmente
-            for (const winner of winningBets) {
-                const prize = ((winner.amount / totalWinningAmount) * totalAmount) * 1,5;
-
-                await connection.execute(`
-                    UPDATE funds SET amount = amount + :prize WHERE user_id = :user_id
-                `, { prize, user_id: winner.user_id }, { autoCommit: true });
-
-                console.log(`Prêmio distribuído para o usuário ${winner.user_id}:`, prize);
-            }
         }
 
-        // Atualiza o status do evento para finalizado
+        // Calcula a odd proporcional
+        const odds = totalAmount / totalWinningAmount;
+
+        // Distribui os ganhos proporcionalmente
+        for (const winner of winningBets) {
+            const prize = winner.amount * odds; // Cálculo do prêmio com base na odd proporcional
+
+            await connection.execute(`
+                UPDATE funds SET amount = amount + :prize WHERE user_id = :user_id
+            `, { prize, user_id: winner.user_id }, { autoCommit: true });
+
+            console.log('Prêmio distribuído para o usuário ${winner.user_id}:, prize');
+        }
+
         await connection.execute(`
             UPDATE events SET status = 'finished' WHERE id = :event_id
         `, { event_id }, { autoCommit: true });
 
         console.log("Evento finalizado e prêmios distribuídos com sucesso!");
-
         res.json({ message: "Evento finalizado e prêmios distribuídos com sucesso!" });
     } catch (error) {
         console.error("Erro ao finalizar evento:", error);
@@ -416,10 +423,9 @@ export const finishEvent = async (req: Request, res: Response): Promise<void> =>
         if (connection) {
             await connection.close();
             console.log("Conexão com o banco de dados fechada.");
-        }
-    }
-};
-
+        }
+    }
+}
    
     
 }

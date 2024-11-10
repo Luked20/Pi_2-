@@ -3,6 +3,10 @@ import { Request, Response, Router } from "express";
 import { AccountsHandler } from "./accounts/accounts";
 import { FinancialManager } from "./Financial/financial";
 import { EventsHandler } from "./Events/events"; // Importar o EventsHandler
+import cors from 'cors';
+
+
+
 
 const port = 3000;
 const app = express();
@@ -11,23 +15,37 @@ const routes = Router();
 // Middleware para habilitar o parsing de JSON
 app.use(express.json());
 
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'DELETE'],  // Adicione os métodos necessários
+    allowedHeaders: ['Content-Type', 'Authorization'],  // Adicione os cabeçalhos que você espera
+    credentials: true
+}));
+
 // Definir as rotas
 routes.get('/', (req: Request, res: Response) => {
-    res.statusCode = 403;
-    res.send('Acesso não permitido. Rota default não disponível.');
+    res.statusCode = 200;
+    res.send('Acesso permitido. Rota default disponível.');
 });
 
-// Rotas para gerenciar a conta
+
 app.post('/register', AccountsHandler.registerHandler);
 app.post('/login', AccountsHandler.loginHandler);
-app.post('/getWalletBalance', FinancialManager.getWalletBalanceHandler);
-app.post("/addNewEvent", EventsHandler.addNewEvent); // Adicionar a nova rota
+app.post('/addFunds', FinancialManager.addFunds);
+app.post('/withdrawFunds', FinancialManager.withdrawFunds);
+app.post("/addNewEvent", EventsHandler.addNewEvent);
+app.post("/evaluateEvent", EventsHandler.moderateEvent);
+app.delete("/deleteEvent", EventsHandler.deleteEvent);
+app.get('/searchEvents', EventsHandler.searchEvents);
+app.post('/betOnEvent', EventsHandler.betOnEvent);
+app.post('/finishEvent', EventsHandler.finishEvent)
+
 app.post("/test", (req, res) => {
     console.log(req.body); // Verifique se o corpo está chegando
     res.send("Recebido!");
 });
 
-// Usar as rotas definidas
+
 app.use(routes);
 
 // Iniciar o servidor

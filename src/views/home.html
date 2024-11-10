@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Eventos - Home</title>
+    <link rel="stylesheet" href="styleHome.css">
+</head>
+<body>
+    <header>
+        <h1>Bem-vindo à Plataforma de Eventos</h1>
+        <div class="search-container">
+            <input type="text" placeholder="Busque eventos por palavras-chave..." id="searchInput">
+            <button onclick="searchEvents()">Buscar</button>
+        </div>
+    </header>
+    
+    <main>
+        <section class="highlights">
+            <h2>Eventos em Destaque</h2>
+            <div class="highlight-card">Próximos de Vencer</div>
+            <div class="highlight-card">Mais Apostados</div>
+        </section>
+        
+        <section class="categories">
+            <h2>Categorias Populares</h2>
+            <div class="category-card" onclick="goToCategory('esportes')">
+                <h3>Esportes</h3>
+            </div>
+            <div class="category-card" onclick="goToCategory('politica')">
+                <h3>Politica</h3>
+            </div>
+            <div class="category-card" onclick="goToCategory('casino')">
+                <h3>Casino</h3>
+            </div>
+            <div class="category-card" onclick="goToCategory('outros')">
+                <h3>Outros</h3>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function searchEvents() {
+            const query = document.getElementById('searchInput').value;
+            if (query) {
+                alert(`Buscando eventos com: ${query}`);
+                // Redirecionar ou buscar dados com a query
+            }
+        }
+
+        function goToCategory(category) {
+            alert(`Redirecionando para a categoria: ${category}`);
+            // Redirecionar para uma nova página de eventos filtrados pela categoria
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Carteira</title>
+    <link rel="stylesheet" href="styleWallet.css">
+</head>
+<body>
+    <header>
+        <h1>Minha Carteira</h1>
+    </header>
+    
+    <main>
+        <!-- Seção de Saldo -->
+        <section class="balance-section">
+            <h2>Saldo Atual</h2>
+            <p id="currentBalance">R$ 0,00</p>
+            <button onclick="addCreditsModal()">Adicionar Créditos</button>
+            <button onclick="withdrawModal()">Sacar Saldo</button>
+        </section>
+
+        <!-- Histórico de Créditos -->
+        <section class="history-section">
+            <h2>Histórico de Créditos</h2>
+            <div class="history-list">
+                <h3>Compras de Créditos</h3>
+                <ul id="creditPurchaseHistory">
+                    <!-- Itens de histórico de compras serão adicionados aqui -->
+                </ul>
+            </div>
+            <div class="history-list">
+                <h3>Uso de Créditos</h3>
+                <ul id="creditUsageHistory">
+                    <!-- Itens de histórico de uso serão adicionados aqui -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- Modal para Adicionar Créditos -->
+        <div class="modal" id="addCreditsModal">
+            <div class="modal-content">
+                <h2>Adicionar Créditos</h2>
+                <label for="creditAmount">Valor (R$):</label>
+                <input type="number" id="creditAmount" min="1" placeholder="Digite o valor desejado">
+                <button onclick="confirmAddCredits()">Confirmar</button>
+                <button onclick="closeModal()">Cancelar</button>
+            </div>
+        </div>
+
+        <!-- Modal para Saque -->
+        <div class="modal" id="withdrawModal">
+            <div class="modal-content">
+                <h2>Sacar Saldo</h2>
+                <label for="withdrawAmount">Valor de Saque (R$):</label>
+                <input type="number" id="withdrawAmount" min="1" max="101000" placeholder="Digite o valor desejado">
+                <label for="bankDetails">Dados Bancários:</label>
+                <input type="text" id="bankDetails" placeholder="Banco, Agência e Número de Conta ou PIX">
+                <button onclick="confirmWithdraw()">Confirmar Saque</button>
+                <button onclick="closeModal()">Cancelar</button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

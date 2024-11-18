@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Eventos - Home</title>
+    <link rel="stylesheet" href="styleHome.css">
+</head>
+<body>
+    <header>
+        <h1>Bem-vindo à Plataforma de Eventos</h1>
+        <div class="user-controls">
+            <button id="createEventButton" style="display: none;" onclick="goToCreateEvent()">Criar Evento</button>
+            <button id="walletButton" style="display: none;" onclick="goToWallet()">Minha Wallet</button>
+            <img id="profileImage" src="" alt="Imagem de Perfil" style="display: none;">
+        </div>
+        <div class="search-container">
+            <input type="text" placeholder="Busque eventos por palavras-chave..." id="searchInput">
+            <button onclick="searchEvents()">Buscar</button>
+        </div>
+    </header>
+    
+    <main>
+        <section class="highlights">
+            <h2>Eventos em Destaque</h2>
+            <div class="highlight-card">Próximos de Vencer</div>
+            <div class="highlight-card">Mais Apostados</div>
+        </section>
+        
+        <section class="categories">
+            <h2>Categorias Populares</h2>
+            <div class="category-card" onclick="goToCategory('esportes')">
+                <h3>Esportes</h3>
+            </div>
+            <div class="category-card" onclick="goToCategory('politica')">
+                <h3>Política</h3>
+            </div>
+            <div class="category-card" onclick="goToCategory('casino')">
+                <h3>Casino</h3>
+            </div>
+            <div class="category-card" onclick="goToCategory('outros')">
+                <h3>Outros</h3>
+            </div>
+        </section>
+
+        <!-- Contêiner de resultados de busca -->
+        <section id="searchResults" class="search-results">
+            <!-- Os resultados da busca serão inseridos aqui -->
+        </section>
+    </main>
+
+    <script src="home.js"></script>
+</body>
+</html>

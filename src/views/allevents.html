@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos os Eventos</title>
+    <link rel="stylesheet" href="alleventsstyles.css">
+</head>
+<body>
+    <header class="allevents-header">
+        <h1>Eventos Disponíveis</h1>
+    </header>
+    <main class="allevents-container">
+        <!-- Os cards serão preenchidos dinamicamente pela API -->
+    </main>
+    <script>
+        // Função para buscar eventos da API com palavra-chave
+        async function fetchEvents(keyword = '') {
+            try {
+                // Monta a URL com a palavra-chave, caso exista
+                const url = `http://localhost:3000/getEvents?keyword=${encodeURIComponent(keyword)}`;
+                const response = await fetch(url);
+
+                // Verifica se a resposta foi bem-sucedida
+                if (!response.ok) {
+                    throw new Error("Erro ao buscar eventos");
+                }
+
+                // Converte a resposta para JSON
+                const events = await response.json();
+                const container = document.querySelector('.allevents-container');
+
+                // Limpa o conteúdo antes de adicionar os novos eventos
+                container.innerHTML = '';
+
+                // Verifica se existem eventos retornados
+                if (events.length === 0) {
+                    container.innerHTML = '<p>Nenhum evento encontrado.</p>';
+                    return;
+                }
+
+                // Cria os cards para cada evento
+                events.forEach(event => {
+                    const card = document.createElement('div');
+                    card.classList.add('event-card');
+
+                    card.innerHTML = `
+                        <h3>${event.title}</h3>
+                        <p>${event.description}</p>
+                        <p>Data: ${new Date(event.event_date).toLocaleDateString()}</p>
+                        <button class="bet-button" onclick="placeBet(${event.id})">Apostar</button>
+                    `;
+
+                    container.appendChild(card);
+
+                    // Adiciona uma linha de espaço entre os cards
+                    const lineBreak = document.createElement('br');
+                    container.appendChild(lineBreak);
+                });
+            } catch (error) {
+                console.error("Erro:", error);
+                const container = document.querySelector('.allevents-container');
+                container.innerHTML = '<p>Ocorreu um erro ao carregar os eventos. Tente novamente mais tarde.</p>';
+            }
+        }
+
+        // Função para manipular o botão de aposta
+        function placeBet(eventId) {
+            alert(`Apostar no evento ${eventId}`);
+            // Aqui você pode redirecionar para uma página de apostas ou enviar os dados para o backend
+        }
+
+        // Chama a função ao carregar a página
+        fetchEvents();
+    </script>
+</body>
+</html>

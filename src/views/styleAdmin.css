@@ -1,0 +1,177 @@
+/* Reset de Estilos Globais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #4b5563, #1f2937);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+/* Contêiner Geral */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+}
+
+/* Container do Painel de Administração */
+.container {
+   
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 900px;
+    text-align: center;
+    margin-top: 0; /* Fixado no topo */
+}
+
+/* Cabeçalho */
+header {
+    margin-bottom: 40px;
+    transition: all 0.3s ease;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: #1f2937;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+header p {
+    font-size: 1rem;
+    color: #4b5563;
+    transition: all 0.3s ease;
+}
+
+/* Botões Centralizados na Parte Inferior */
+.btn-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: auto; /* Faz com que os botões fiquem no final da tela */
+    margin-bottom: 50px; /* Espaçamento dos botões em relação ao rodapé */
+}
+
+/* Estilos dos Botões */
+button {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 220px;
+    max-width: 270px;
+    text-align: center;
+    transform: translateY(0);
+}
+
+/* Botões com Cores Diferentes */
+.btn1 {
+    background: #10b981; /* Verde */
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn1:hover {
+    background: #059669;
+    box-shadow: 0 5px 25px rgba(16, 185, 129, 0.5);
+    transform: translateY(-5px);
+}
+
+.btn2 {
+    background: #ef4444; /* Vermelho */
+    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+}
+
+.btn2:hover {
+    background: #dc2626;
+    box-shadow: 0 5px 25px rgba(239, 68, 68, 0.5);
+    transform: translateY(-5px);
+}
+
+.btn3 {
+    background: #6366f1; /* Roxo */
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn3:hover {
+    background: #4f46e5;
+    box-shadow: 0 5px 25px rgba(99, 102, 241, 0.5);
+    transform: translateY(-5px);
+}
+
+/* Botão de Voltar */
+.btn-back {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    background: #6366f1;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.btn-back:hover {
+    background: #4f46e5;
+    box-shadow: 0 5px 25px rgba(99, 102, 241, 0.5);
+    transform: translateY(-5px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    header p {
+        font-size: 1rem;
+    }
+
+    .btn-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    button {
+        min-width: 80%;
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    .btn-back {
+        font-size: 1rem;
+    }
+
+    button {
+        padding: 12px 20px;
+    }
+}

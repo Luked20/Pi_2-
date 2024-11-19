@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Eventos - Home</title>
+    <link rel="stylesheet" href="styleHome.css">
+</head>
+<body>
+    <header>
+        <h1>Bem-vindo à Quantum Bet</h1>
+        <div class="user-controls">
+            <img id="profileImage" src="" alt="Imagem de Perfil" onclick="toggleUserOptions()" style="cursor: pointer;">
+            <span id="profile-name" style="margin-left: 10px;"></span>
+            
+            <!-- Container que ficará oculto inicialmente -->
+            <div id="userOptionsContainer" style="display: none;">
+                <button id="createEventButton" onclick="goToCreateEvent()">Criar Evento</button>
+                <button id="walletButton" onclick="goToWallet()">Minha Wallet</button>
+                <button id="adminButton" onclick="goToAdminPage()">Admin</button> 
+                <button id="betButton" onclick="goToBettingPage()">Apostar</button> 
+            </div>
+        </div>
+        <div class="search-container">
+            <input type="text" placeholder="Busque eventos por palavras-chave..." id="searchInput">
+            <button onclick="searchEvents()">Buscar</button>
+        </div>
+    </header>
+    
+    <main>
+        <section class="highlights">
+            <h2>Aposte em Eventos</h2>
+            <div class="highlight-card">Eventos</div>
+            <button class="bet-button" onclick="window.location.href='allevents.html'">Apostar Aqui</button>
+        </section>
+        
+        <section class="categories">
+            <h2>Categorias Populares</h2>
+            <div class="category-card" onclick="goToCategory('esportes')">
+                <h3>Esportes</h3>
+            </div>
+            <div class="category-card" onclick="goToCategory('politica')">
+                <h3>Política</h3>
+            </div>
+            <div class="category-card" onclick="goToCategory('casino')">
+                <h3>Casino</h3>
+            </div>
+            <div class="category-card" onclick="goToCategory('outros')">
+                <h3>Outros</h3>
+            </div>
+        </section>
+
+        <div class="carousel">
+            <div class="carousel-track">
+                <div class="carousel-slide" style="background-image: url('quantum.png');"></div>
+                <div class="carousel-slide" style="background-image: url('quantum.png');"></div>
+                <div class="carousel-slide" style="background-image: url('quantum.png');"></div>
+            </div>
+            <div class="carousel-indicators">
+                <button class="active"></button>
+                <button></button>
+                <button></button>
+            </div>
+        </div>
+        
+
+        <!-- Contêiner de resultados de busca -->
+        <section id="searchResults" class="search-results">
+            <div class="event-card" id="eventCard" style="display: none;">
+                <button class="close-btn" id="closeButton">&times;</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="home.js"></script>
+</body>
+</html>

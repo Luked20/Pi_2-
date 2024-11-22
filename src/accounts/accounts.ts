@@ -180,15 +180,17 @@ export namespace AccountsHandler {
             connection = await connectToDatabase();
 
             const result = await connection.execute(
-                `SELECT completeName FROM ACCOUNTS WHERE id = :userId`,
+                `SELECT completeName, id FROM ACCOUNTS WHERE id = :userId`,
                 { userId }
             );
 
             if (result.rows && result.rows.length > 0) {
-                const row = result.rows[0] as (string)[];
+                const row = result.rows[0] as (string | number)[];
                 const userCompleteName = row[0];
+                const userIdFromDb = row[1];  // O id do usuário recuperado do banco
 
-                res.status(200).json({ completeName: userCompleteName });
+                // Retorna o nome completo e o id do usuário
+                res.status(200).json({ completeName: userCompleteName, id: userIdFromDb });
             } else {
                 res.status(404).send('Usuário não encontrado.');
             }
@@ -205,6 +207,7 @@ export namespace AccountsHandler {
         res.status(401).send('Token inválido.');
     }
 };
+
 
 
 

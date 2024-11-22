@@ -443,6 +443,35 @@ header h1 {
     transform: scale(1.05);
 }
 
+.bet-button {
+    background-color: #218838; /* Azul principal */
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%; /* Responsivo */
+    max-width: 200px; /* Tamanho máximo */
+    margin: 10px auto; /* Espaçamento e centralização */
+    display: block; /* Garantir centralização */
+    text-align: center; /* Texto centralizado */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra leve */
+}
+
+/* Efeito hover */
+.bet-button:hover {
+    background-color: #0056b3; /* Azul mais escuro */
+    transform: scale(1.05); /* Pequeno zoom */
+}
+
+/* Efeito ativo */
+.bet-button:active {
+    background-color: #004085; /* Azul ainda mais escuro */
+    transform: scale(0.95); /* Efeito pressionado */
+}
+
 
 
 

@@ -43,7 +43,8 @@ h2 {
     transform: scale(1.05);
 }
 
-.bet-button {
+.bet-button,
+.admin-button { /* Botão de aposta e de admin com os mesmos estilos */
     margin-top: 15px;
     padding: 10px 20px;
     font-size: 1.2rem;
@@ -55,7 +56,8 @@ h2 {
     transition: background-color 0.3s ease;
 }
 
-.bet-button:hover {
+.bet-button:hover,
+.admin-button:hover { /* Efeito de hover nos dois botões */
     background-color: #059669;
 }
 

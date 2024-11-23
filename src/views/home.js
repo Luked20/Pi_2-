@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const createEventButton = document.getElementById('createEventButton');
     const walletButton = document.getElementById('walletButton');
     const profileImage = document.getElementById('profileImage');
+    const closeButton = document.querySelector('#closeButton');
+    const userOptionsContainer = document.querySelector('#userOptionsContainer');
 
     // Verificar se o usuário está logado
     const token = localStorage.getItem('token'); // Recupera o token
@@ -78,6 +80,12 @@ const track = document.querySelector('.carousel-track');
 function goToCreateEvent() {
     window.location.href = 'createEvent.html';
 }
+
+
+
+closeButton.addEventListener('click', () => {
+    userOptionsContainer.classList.remove('show');
+});
 
 // Função para alternar a visibilidade do container de opções do usuário
 function toggleUserOptions() {

@@ -12,13 +12,13 @@
     </header>
     
     <main>
-        
+        <!-- Detalhes do Evento -->
+        <section id="event-details" class="event-section">
+            <!-- Os detalhes do evento serão carregados dinamicamente -->
+        </section>
 
-        <!-- Campo de título do evento -->
+        <!-- Campo de Aposta -->
         <section class="bet-section">
-            <h3>Título do Evento</h3>
-            <input type="text" id="eventTitle" placeholder="Digite o título do evento" required>
-
             <!-- Opções de Aposta -->
             <h3>Escolha sua Aposta</h3>
             <div class="bet-options">
@@ -31,11 +31,10 @@
 
             <!-- Botão de Confirmação -->
             <button onclick="confirmBet()">Confirmar Aposta</button>
-            <p id="balanceMessage" style="display: none;">Saldo insuficiente. Por favor, adicione créditos.</p>
-            <button onclick="addCredits()" id="addCreditsBtn" style="display: none;">Adicionar Créditos</button>
-            <script src="bet.js"></script>
+            <p id="message"></p>
         </section>
     </main>
-
+    
+    <script src="bet.js"></script>
 </body>
 </html>

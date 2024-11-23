@@ -46,7 +46,7 @@ app.get('/getProfile', AccountsHandler.getProfile)
 
 
 app.post("/test", (req, res) => {
-    console.log(req.body); // Verifique se o corpo está chegando
+    console.log(req.body); 
     res.send("Recebido!");
 });
 

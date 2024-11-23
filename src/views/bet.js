@@ -1,60 +1,152 @@
-// Função para adicionar créditos
-document.getElementById('addCreditsBtn').addEventListener('click', async function(event) {
-    event.preventDefault(); // Impede o envio padrão
+// Função para obter os parâmetros da URL
+function getQueryParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        eventId: params.get('eventId')
+    };
+}
 
-    const amount = parseFloat(document.getElementById('betAmount').value);
+// Função para carregar os detalhes do evento
+async function loadEventDetails() {
+    const { eventId } = getQueryParams();
 
-    // Verifique se o valor é válido
-    if (isNaN(amount) || amount <= 0) {
-        document.getElementById('balanceMessage').textContent = "Por favor, insira um valor válido para os créditos.";
-        document.getElementById('balanceMessage').style.display = 'block';
-        console.error("Valor inválido para os créditos.");
+    if (!eventId) {
+        document.getElementById('event-details').innerHTML = '<p>Evento não encontrado.</p>';
         return;
     }
 
-    // Enviar dados para a API
     try {
-        console.log("Enviando dados para a API...");
+        const response = await fetch(`http://localhost:3000/getEvents?id=${eventId}`);
+        if (!response.ok) {
+            throw new Error("Erro ao carregar detalhes do evento.");
+        }
 
-        const response = await fetch('http://localhost:3000/addFunds', {
+        const event = await response.json();
+
+        // Exibe os detalhes do evento
+        const eventDetails = document.getElementById('event-details');
+        eventDetails.innerHTML = `
+            <h2>${event.title}</h2>
+            <p>${event.description}</p>
+            <p>Data: ${new Date(event.event_date).toLocaleDateString()}</p>
+        `;
+    } catch (error) {
+        console.error("Erro ao buscar detalhes do evento:", error);
+        document.getElementById('event-details').innerHTML = '<p>Erro ao carregar os detalhes do evento.</p>';
+    }
+}
+
+// Variável para armazenar a opção de aposta
+let selectedBetOption = null;
+
+// Define a opção selecionada
+function selectBetOption(option) {
+    selectedBetOption = option;
+    document.getElementById('message').textContent = `Opção selecionada: ${option === 'yes' ? 'Sim' : 'Não'}`;
+}
+
+// Função para recuperar o perfil do usuário a partir do token
+// Função para obter o perfil do usuário
+async function getUserProfile() {
+    const token = localStorage.getItem('token');  // Obtém o token do localStorage
+    if (!token) {
+        console.error("Token não encontrado, por favor, faça o login.");
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/getProfile', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Envia o token no header
+            },
+        });
+
+        const profile = await response.json();
+
+        // Log para verificar o conteúdo completo do perfil
+        console.log("Perfil completo:", profile);
+
+        if (response.ok) {
+            console.log("ID do usuário recuperado do perfil:", profile.id);  // Agora deve funcionar
+            return profile;  // Retorna o perfil
+        } else {
+            console.error("Erro ao obter o perfil:", profile);
+        }
+    } catch (error) {
+        console.error("Erro ao chamar o backend para obter o perfil:", error);
+    }
+}
+
+
+getUserProfile();
+
+
+// Função para confirmar a aposta
+async function confirmBet() {
+    const { eventId } = getQueryParams();
+    const betAmount = document.getElementById('betAmount').value;
+
+    if (!eventId) {
+        document.getElementById('message').textContent = "Evento não encontrado.";
+        document.getElementById('message').style.color = "red";
+        return;
+    }
+
+    if (!selectedBetOption) {
+        document.getElementById('message').textContent = "Por favor, selecione uma opção de aposta.";
+        document.getElementById('message').style.color = "red";
+        return;
+    }
+
+    if (!betAmount || betAmount <= 0) {
+        document.getElementById('message').textContent = "Por favor, insira um valor válido para a aposta.";
+        document.getElementById('message').style.color = "red";
+        return;
+    }
+
+    // Recupera o perfil do usuário para pegar o ID
+    const profile = await getUserProfile();
+    if (!profile) {
+        console.log("Perfil não encontrado ou erro na recuperação");  // Log de erro
+        return; // Se não conseguir recuperar o perfil, sai da função
+    }
+
+    console.log("ID do usuário recuperado do perfil:", profile.id);  // Log para verificar o ID
+
+    const userId = profile.id;
+
+    try {
+        const response = await fetch('http://localhost:3000/betOnEvent', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-               
+                'Authorization': `Bearer ${localStorage.getItem('token')}` // Envia o token do usuário logado
             },
-            body: JSON.stringify({ amount: amount })
+            body: JSON.stringify({
+                user_id: userId,                // Envia o user_id recuperado do perfil
+                event_id: eventId,              // ID do evento
+                statusBet: selectedBetOption,   // Opção de aposta
+                amount: betAmount               // Valor da aposta
+            })
         });
 
-        console.log("Resposta recebida da API:", response);
+        const result = await response.json();
+        const messageDiv = document.getElementById('message');
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Erro na resposta da API:", errorText);
-            throw new Error(errorText);
+        if (response.ok) {
+            messageDiv.textContent = "Aposta realizada com sucesso!";
+            messageDiv.style.color = "green";
+        } else {
+            throw new Error(result.message || "Erro ao realizar a aposta.");
         }
-
-        const data = await response.json();
-        document.getElementById('balanceMessage').textContent = data.message;
-        document.getElementById('balanceMessage').style.display = 'block';
-        console.log("Créditos adicionados com sucesso:", data.message);
-
     } catch (error) {
-        console.error("Erro ao adicionar créditos:", error);
-        document.getElementById('balanceMessage').textContent = error.message;
-        document.getElementById('balanceMessage').style.display = 'block';
+        const messageDiv = document.getElementById('message');
+        messageDiv.textContent = error.message;
+        messageDiv.style.color = "red";
+        console.error("Erro ao confirmar aposta:", error);  // Log do erro ao confirmar aposta
     }
-});
-
-// Função para confirmar aposta
-function confirmBet() {
-    const eventTitle = document.getElementById('eventTitle').value;
-    const betAmount = parseFloat(document.getElementById('betAmount').value);
-
-    if (!eventTitle || isNaN(betAmount) || betAmount <= 0) {
-        alert("Por favor, preencha todos os campos corretamente.");
-        return;
-    }
-
-    // Realizar lógica da aposta aqui
-    console.log("Aposta confirmada:", { eventTitle, betAmount });
 }
+
+// Carrega os detalhes do evento ao abrir a página
+loadEventDetails();

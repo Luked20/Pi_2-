@@ -67,30 +67,53 @@ export namespace EventsHandler {
         }
     };
 
-    // Handler para moderar um evento (admin)
+   
     export const moderateEvent = async (req: Request, res: Response): Promise<void> => {
         const { eventId, action, reason } = req.body;
-
+    
+        console.log("Requisição recebida:", req.body); // Log da requisição
+    
         if (!eventId || !action) {
+            console.error("Parâmetros faltando:", req.body); // Log se algum parâmetro estiver faltando
             res.status(400).send('Requisição inválida - Parâmetros faltando.');
             return;
         }
-
+    
         let connection;
-
+    
         try {
+            console.log("Conectando ao banco de dados...");
+    
             connection = await connectToDatabase();
-
+            console.log("Conexão estabelecida com sucesso.");
+    
+            // Verifica o valor correto de 'action' e define o status
+            let status: string;
+            if (action === 'approved') {
+                status = 'approved'; // Se a ação for 'approved', define o status como 'approved'
+            } else if (action === 'rejected') {
+                status = 'rejected'; // Se a ação for 'rejected', define o status como 'rejected'
+            } else {
+                console.error('Ação inválida:', action);
+                res.status(400).send('Ação inválida.');
+                return;
+            }
+    
+            // Atualiza o status do evento no banco de dados
             const result = await connection.execute(
                 `UPDATE events SET status = :status, updated_at = CURRENT_TIMESTAMP WHERE id = :eventId`,
                 {
-                    status: action === 'aprovar' ? 'approved' : 'rejected',
+                    status: status,
                     eventId,
                 },
                 { autoCommit: true }
             );
-
-            if (action === 'reprovar' && reason) {
+    
+            console.log(`Evento ${eventId} modificado. Status: ${status}`);
+    
+            // Se a ação for 'rejected', atualiza a descrição com o motivo
+            if (action === 'rejected' && reason) {
+                console.log(`Atualizando descrição do evento com motivo: ${reason}`);
                 await connection.execute(
                     `UPDATE events SET description = :reason WHERE id = :eventId`,
                     {
@@ -100,18 +123,21 @@ export namespace EventsHandler {
                     { autoCommit: true }
                 );
             }
-
+    
             if (result.rowsAffected && result.rowsAffected > 0) {
-                res.status(200).send('Evento moderado com sucesso!');
+                console.log("Evento moderado com sucesso!");
+                res.status(200).json({ message: 'Evento moderado com sucesso!' });
             } else {
-                res.status(404).send('Evento não encontrado.');
+                console.error("Evento não encontrado:", eventId);
+                res.status(404).json({ message: 'Evento não encontrado.' });
             }
         } catch (error) {
             console.error("Erro ao moderar evento:", error);
-            res.status(500).send(error instanceof Error ? error.message : "Erro desconhecido.");
+            res.status(500).json({ message: error instanceof Error ? error.message : "Erro desconhecido." });
         } finally {
             if (connection) {
                 try {
+                    console.log("Fechando conexão com o banco de dados.");
                     await connection.close();
                 } catch (err) {
                     console.error("Erro ao fechar a conexão:", err);
@@ -119,7 +145,7 @@ export namespace EventsHandler {
             }
         }
     };
-
+    
     interface Event {
         id: number;
         status: string;
@@ -348,7 +374,7 @@ export const finishEvent = async (req: Request, res: Response): Promise<void> =>
         return;
     }
 
-    if (admin_id !== 110) {
+    if (admin_id !== 163) {
         console.error("Apenas o admin pode finalizar o evento.");
         res.status(403).json({ message: "Acesso negado. Apenas o admin pode finalizar eventos." });
         return;

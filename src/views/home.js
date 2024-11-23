@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Nome completo não encontrado nos dados:', data);
             }
 
-            if (data.completeName === "Admin") {
+            if (data.completeName === "Admin_PI") {
                 adminButton.style.display = 'inline-block'; // Exibe o botão de admin
             } else {
                 adminButton.style.display = 'none'; // Esconde o botão de admin
@@ -133,7 +133,7 @@ async function searchEvents() {
                             <p><strong>Status:</strong> ${event.status}</p>
                             <p><strong>Criado em:</strong> ${new Date(event.created_at).toLocaleDateString()}</p>
                             <p><strong>Atualizado em:</strong> ${new Date(event.updated_at).toLocaleDateString()}</p>
-                            <button onclick="showEventDetails(${event.id})">Ver Detalhes</button>
+                            <button onclick="showEventDetails(${event.id}, '${event.title}', '${event.description}', '${event.event_date}', '${event.status}')">Ver Detalhes</button>
                         </div>
                     `;
                     resultsContainer.appendChild(eventElement);
@@ -148,15 +148,18 @@ async function searchEvents() {
     }
 }
 
-// Função para exibir detalhes do evento
-function showEventDetails(eventId) {
-    // Lógica para exibir os detalhes do evento (overlay)
+// Função para exibir detalhes do evento em um overlay
+function showEventDetails(eventId, title, description, eventDate, status) {
     const overlay = document.createElement('div');
     overlay.classList.add('overlay');
     overlay.innerHTML = `
         <div class="event-detail-card">
-            <h2>Detalhes do Evento ${eventId}</h2>
-            <p>Detalhes do evento com ID: ${eventId} serão carregados aqui...</p>
+            <h2>Detalhes do Evento</h2>
+            <p><strong>Título:</strong> ${title}</p>
+            <p><strong>Descrição:</strong> ${description}</p>
+            <p><strong>Data:</strong> ${new Date(eventDate).toLocaleDateString()}</p>
+            <p><strong>Status:</strong> ${status}</p>
+            <button class="bet-button" onclick="window.location.href='bet.html?eventId=${eventId}'">Apostar</button>
             <button onclick="closeEventDetails()">Fechar</button>
         </div>
     `;
@@ -165,7 +168,6 @@ function showEventDetails(eventId) {
 
 // Função para fechar o overlay de detalhes do evento
 function closeEventDetails() {
-    // Fechar o overlay
     const overlay = document.querySelector('.overlay');
     if (overlay) {
         overlay.remove();

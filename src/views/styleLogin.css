@@ -89,6 +89,8 @@ button[type="submit"]:active {
     background-color: #312e81;
 }
 
+
+
 /* Animações de Entrada */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-30px); }

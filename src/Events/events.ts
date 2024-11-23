@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import dotenv from 'dotenv';
 import { Connection } from 'oracledb';
 import { stringify } from 'flatted';
+import nodemailer from "nodemailer";
+import jwt from 'jsonwebtoken';
 
 
 
@@ -21,7 +23,7 @@ async function connectToDatabase() {
 
 // Namespace para gerenciar eventos
 export namespace EventsHandler {
-
+  
     // Handler para adicionar um novo evento
     export const addNewEvent = async (req: Request, res: Response): Promise<void> => {
         const { title, description, event_date } = req.body;
@@ -66,60 +68,82 @@ export namespace EventsHandler {
             }
         }
     };
-
-    // Handler para moderar um evento (admin)
+    
+   
     export const moderateEvent = async (req: Request, res: Response): Promise<void> => {
-        const { eventId, action, reason } = req.body;
-
-        if (!eventId || !action) {
-            res.status(400).send('Requisição inválida - Parâmetros faltando.');
+        const token = req.headers['authorization']?.split(' ')[1]; // Supondo o formato Bearer {token}
+    
+        if (!token) {
+            res.status(401).send("Token não fornecido.");
             return;
         }
-
-        let connection;
-
+    
         try {
-            connection = await connectToDatabase();
-
-            const result = await connection.execute(
-                `UPDATE events SET status = :status, updated_at = CURRENT_TIMESTAMP WHERE id = :eventId`,
-                {
-                    status: action === 'aprovar' ? 'approved' : 'rejected',
-                    eventId,
-                },
-                { autoCommit: true }
-            );
-
-            if (action === 'reprovar' && reason) {
-                await connection.execute(
-                    `UPDATE events SET description = :reason WHERE id = :eventId`,
-                    {
-                        reason,
-                        eventId,
-                    },
+            // Decodifica o token para obter o ID do usuário
+            const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
+            const userId = decoded.id;
+    
+            const { eventId, action, reason } = req.body;
+    
+            if (!eventId || !action) {
+                res.status(400).send("Requisição inválida - Parâmetros faltando.");
+                return;
+            }
+    
+            let connection;
+    
+            try {
+                connection = await connectToDatabase();
+    
+                // Determina o status com base na ação recebida
+                let status: string;
+                if (action === "approved") {
+                    status = "approved";
+                } else if (action === "rejected") {
+                    status = "rejected";
+                } else {
+                    res.status(400).send("Ação inválida.");
+                    return;
+                }
+    
+                // Atualiza o status do evento
+                const updateStatusResult = await connection.execute(
+                    `UPDATE events SET status = :status, updated_at = CURRENT_TIMESTAMP WHERE id = :eventId`,
+                    { status, eventId },
                     { autoCommit: true }
                 );
-            }
-
-            if (result.rowsAffected && result.rowsAffected > 0) {
-                res.status(200).send('Evento moderado com sucesso!');
-            } else {
-                res.status(404).send('Evento não encontrado.');
-            }
-        } catch (error) {
-            console.error("Erro ao moderar evento:", error);
-            res.status(500).send(error instanceof Error ? error.message : "Erro desconhecido.");
-        } finally {
-            if (connection) {
-                try {
-                    await connection.close();
-                } catch (err) {
-                    console.error("Erro ao fechar a conexão:", err);
+    
+                if (updateStatusResult.rowsAffected === 0) {
+                    res.status(404).json({ message: "Evento não encontrado." });
+                    return;
+                }
+    
+                // Se rejeitado, atualiza a descrição e registra o motivo
+                if (status === "rejected" && reason) {
+                    await connection.execute(
+                        `UPDATE events SET description = :reason WHERE id = :eventId`,
+                        { reason, eventId },
+                        { autoCommit: true }
+                    );
+                }
+    
+                res.status(200).json({ message: "Evento moderado com sucesso!" });
+            } catch (error) {
+                res.status(500).json({ message: error instanceof Error ? error.message : "Erro desconhecido." });
+            } finally {
+                if (connection) {
+                    try {
+                        await connection.close();
+                    } catch (err) {
+                        console.error("Erro ao fechar a conexão:", err);
+                    }
                 }
             }
+        } catch (error) {
+            res.status(403).send("Token inválido ou expirado.");
         }
     };
-
+    
     interface Event {
         id: number;
         status: string;
@@ -127,42 +151,67 @@ export namespace EventsHandler {
       }
 
       export const deleteEvent = async (req: Request, res: Response): Promise<void> => {
-        const { eventId, id } = req.body; // Mude userId para id
+        const { eventId, id } = req.body;
         let connection;
     
-        
+        // Verificar se eventId e id foram fornecidos
         if (!eventId || !id) {
+            console.error('Parâmetros ausentes: eventId ou id não fornecido');
             res.status(400).json({ message: 'eventId e id são obrigatórios.' });
-            return;
+            return; // Aqui está correto, pois precisamos parar a execução se algum parâmetro estiver faltando
         }
     
         try {
+            console.log('Iniciando processo de deleção...');
+            console.log(`Evento ID: ${eventId}, Moderador ID: ${id}`);
+    
             connection = await connectToDatabase();
-            
-           
+            console.log('Conectando ao banco de dados...');
+    
+            // Verificar se o evento existe
             const eventResult = await connection.execute(
-                `SELECT * FROM EVENTS WHERE id = :eventId AND id = :id`,
-                [eventId, id]
-            );
-    
-            
-            if (!eventResult || !eventResult.rows || eventResult.rows.length === 0) {
-                res.status(404).json({ message: 'Evento não encontrado ou você não tem permissão para deletar este evento.' });
-                return;
-            }
-    
-        
-            await connection.execute(
-                `UPDATE EVENTS SET status = 'deleted' WHERE id = :eventId`,
+                `SELECT * FROM EVENTS WHERE id = :eventId`,
                 [eventId]
             );
     
-            res.json({ message: 'Evento removido com sucesso.' });
+            console.log('Resultado da consulta ao banco de dados:', eventResult);
+    
+            if (!eventResult || !eventResult.rows || eventResult.rows.length === 0) {
+                console.error('Evento não encontrado');
+                res.status(404).json({ message: 'Evento não encontrado.' });
+                return; // Aqui também é necessário retornar para evitar continuar o processamento
+            }
+    
+            // Verificar se o moderador tem permissão (ID fixo 163)
+            if (id !== 163) {
+                console.error('Moderador não tem permissão para deletar este evento');
+                res.status(403).json({ message: 'Você não tem permissão para deletar este evento.' });
+                return;
+            }
+    
+            // Atualizar o status do evento para 'deleted'
+            const updateResult = await connection.execute(
+                `UPDATE EVENTS SET status = 'deleted' WHERE id = :eventId`,
+                [eventId],
+                { autoCommit: true } // Assegura que a atualização seja confirmada
+            );
+    
+            console.log('Resultado da atualização no banco de dados:', updateResult);
+    
+            // Verificar se o evento foi atualizado corretamente
+            if (updateResult.rowsAffected === 0) {
+                console.error('Erro ao atualizar o evento: Nenhuma linha afetada');
+                res.status(500).json({ message: 'Erro ao atualizar o evento.' });
+                return;
+            }
+    
+            console.log('Evento deletado com sucesso.');
+            res.json({ message: 'Evento deletado com sucesso.' }); // Resposta final
+    
         } catch (error) {
-            console.error('Erro ao tentar remover o evento:', error);
-            res.status(500).json({ message: 'Erro ao tentar remover o evento.' });
+            console.error('Erro ao tentar deletar o evento:', error);
+            res.status(500).json({ message: 'Erro interno ao tentar deletar o evento. Verifique os logs para mais detalhes.' });
         } finally {
-            // Certifique-se de fechar a conexão se ela estiver aberta
             if (connection) {
                 try {
                     await connection.close();
@@ -172,6 +221,8 @@ export namespace EventsHandler {
             }
         }
     };
+    
+    
 
     interface Event {
         id: number;
@@ -348,7 +399,7 @@ export const finishEvent = async (req: Request, res: Response): Promise<void> =>
         return;
     }
 
-    if (admin_id !== 110) {
+    if (admin_id !== 163) {
         console.error("Apenas o admin pode finalizar o evento.");
         res.status(403).json({ message: "Acesso negado. Apenas o admin pode finalizar eventos." });
         return;
@@ -480,4 +531,3 @@ export const getEvents = async (req: Request, res: Response): Promise<void> => {
 }
    
     
-

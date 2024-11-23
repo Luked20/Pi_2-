@@ -43,10 +43,11 @@ app.post('/betOnEvent', EventsHandler.betOnEvent);
 app.post('/finishEvent', EventsHandler.finishEvent)
 app.get('/getEvents', EventsHandler.getEvents); 
 app.get('/getProfile', AccountsHandler.getProfile)
+app.get('/getBalance', FinancialManager.getBalance)
 
 
 app.post("/test", (req, res) => {
-    console.log(req.body); // Verifique se o corpo está chegando
+    console.log(req.body); 
     res.send("Recebido!");
 });
 

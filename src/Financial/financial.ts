@@ -158,4 +158,67 @@ export namespace FinancialManager {
             res.status(403).json({ message: 'Token inválido ou expirado.' });
         }
     };
+
+    export const getBalance = async (req: Request, res: Response): Promise<void> => {
+        const token = req.headers.authorization?.split(" ")[1]?.trim(); // Extrair o token do header de Authorization
+
+        if (!token) {
+            res.status(401).json({ message: "Token não fornecido." });
+            return;
+        }
+
+        try {
+            const secretKey = "pi_auth";
+            const decoded = jwt.verify(token, secretKey) as { id: number };
+            const user_id = decoded.id;
+
+            console.log(`Token decodificado com sucesso. ID do usuário: ${user_id}`);
+
+            let connection;
+
+            try {
+                connection = await connectToDatabase();
+                console.log('Conexão com o banco de dados estabelecida com sucesso.');
+
+                // Consultar o saldo do usuário
+                const result = await connection.execute(
+                    `SELECT amount FROM FUNDS WHERE user_id = :user_id`,
+                    { user_id }
+                ) as { rows: [number[]] };
+
+                // Verificar se a consulta retornou algum valor
+                if (!result.rows?.length) {
+                    console.log(`Nenhum saldo encontrado para o usuário com ID: ${user_id}`);
+                    res.status(404).json({ message: 'Usuário não encontrado ou saldo inexistente.' });
+                    return;
+                }
+
+                // Acessar o saldo da primeira linha e primeira coluna
+                const currentBalance = result.rows[0][0];
+
+                if (currentBalance === undefined || typeof currentBalance !== 'number') {
+                    console.log(`Saldo inválido recuperado: ${currentBalance}`);
+                    res.status(500).json({ message: 'Erro ao recuperar o saldo do usuário.' });
+                    return;
+                }
+
+                console.log(`Saldo atual do usuário (ID: ${user_id}): R$ ${currentBalance}`);
+
+                res.status(200).json({ balance: currentBalance });
+
+            } catch (error) {
+                console.error('Erro ao recuperar o saldo:', error);
+                res.status(500).json({ message: 'Erro ao recuperar o saldo.' });
+            } finally {
+                if (connection) {
+                    await connection.close();
+                    console.log('Conexão com o banco de dados fechada.');
+                }
+            }
+        } catch (err) {
+            console.error('Erro ao verificar o token:', err);
+            res.status(403).json({ message: 'Token inválido ou expirado.' });
+        }
+    };
 }
+

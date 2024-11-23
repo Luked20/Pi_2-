@@ -13,6 +13,7 @@ body {
     align-items: center;
     background: linear-gradient(135deg, #0d1b2a, #1b263b);
     color: #ffffff;
+    padding: 20px;
 }
 
 /* Cabeçalho */
@@ -29,62 +30,51 @@ header h1 {
 }
 
 /* Seção de Saldo */
-.balance-section {
+.wallet-container {
     margin-top: 20px;
     text-align: center;
+    width: 100%;
+    max-width: 400px;
 }
 
-.balance-section h2 {
-    font-size: 1.8rem;
-    color: #10b981; /* Cor do título do saldo ajustada */
+.wallet-title {
+    font-size: 2.5rem;
+    color: #10b981;
 }
 
-.balance-section p {
-    font-size: 2rem;
-    margin: 10px 0;
+.wallet-balance {
+    font-size: 1.6rem;
+    margin-top: 10px;
 }
 
-.balance-section button {
-    margin: 10px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    background: #10b981; /* Cor do botão ajustada */
-    color: #ffffff; /* Texto do botão em branco */
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.balance-section button:hover {
-    background: #059669; /* Cor do botão ao passar o mouse */
-}
-
-/* Histórico */
-.history-section {
-    width: 80%;
+.wallet-buttons {
     margin-top: 20px;
 }
 
-.history-section h2 {
-    font-size: 1.6rem;
-    margin-bottom: 10px;
-    color: #10b981; /* Cor do título do histórico ajustada */
-}
-
-.history-list {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 10px;
+.wallet-button {
+    padding: 12px 24px;
+    font-size: 1.2rem;
+    border: none;
     border-radius: 5px;
-    margin-bottom: 20px;
+    background: #10b981;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin: 10px;
+    width: 100%;
+    max-width: 200px;
 }
 
-.history-list h3 {
-    color: #10b981; /* Cor dos títulos do histórico ajustada */
+.wallet-button:hover {
+    background: #059669;
 }
 
-.history-list ul {
-    list-style: none;
+.wallet-button.withdraw {
+    background: #f44336;
+}
+
+.wallet-button.withdraw:hover {
+    background: #d32f2f;
 }
 
 /* Modal */
@@ -115,18 +105,19 @@ header h1 {
     margin-bottom: 20px;
 }
 
-.modal-content label, .modal-content input {
+.modal-content label,
+.modal-content input {
     display: block;
     width: 100%;
     margin-bottom: 10px;
-    color: #ffffff; /* Cor do texto dos labels ajustada */
+    color: #ffffff;
 }
 
 .modal-content input {
     padding: 10px;
     border: none;
     border-radius: 5px;
-    background: rgba(255, 255, 255, 0.2); /* Fundo dos inputs no modal */
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .modal-content button {
@@ -136,6 +127,8 @@ header h1 {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    width: 100%;
+    max-width: 150px;
 }
 
 .modal-content button:first-child {
@@ -146,4 +139,53 @@ header h1 {
 .modal-content button:last-child {
     background: #f44336; /* Cor do botão de cancelamento no modal */
     color: white;
+}
+
+/* Media Queries para Responsividade */
+@media (max-width: 768px) {
+    .wallet-title {
+        font-size: 2rem;
+    }
+
+    .wallet-balance {
+        font-size: 1.4rem;
+    }
+
+    .wallet-button {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+
+    .modal-content {
+        width: 90%;
+    }
+
+    .modal-content button {
+        font-size: 1rem;
+        padding: 8px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .wallet-title {
+        font-size: 1.8rem;
+    }
+
+    .wallet-balance {
+        font-size: 1.2rem;
+    }
+
+    .wallet-button {
+        font-size: 1rem;
+        padding: 8px 16px;
+    }
+
+    .modal-content button {
+        font-size: 1rem;
+        padding: 8px 16px;
+    }
 }

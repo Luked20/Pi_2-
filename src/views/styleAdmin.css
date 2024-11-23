@@ -13,7 +13,7 @@ body {
     justify-content: flex-start;
     align-items: center;
     min-height: 100vh;
-    padding: 20px;
+    padding: 40px 20px;
     overflow-x: hidden;
 }
 
@@ -21,54 +21,67 @@ body {
 .page-wrapper {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     width: 100%;
-    height: 100vh;
+    height: auto;
+    gap: 20px; /* Espaçamento geral entre os elementos */
 }
 
 /* Container do Painel de Administração */
 .container {
-   
+    background: linear-gradient(145deg, #ffffff, #e5e7eb);
     border-radius: 15px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    padding: 40px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), inset 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 40px 30px;
     width: 100%;
-    max-width: 900px;
+    max-width: 700px;
     text-align: center;
-    margin-top: 0; /* Fixado no topo */
+    margin-bottom: 40px;
+}
+
+.container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 /* Cabeçalho */
 header {
-    margin-bottom: 40px;
-    transition: all 0.3s ease;
+    margin-bottom: 30px; /* Espaçamento inferior para separar do conteúdo */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 header h1 {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     color: #1f2937;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     letter-spacing: 2px;
     text-transform: uppercase;
+    background: linear-gradient(90deg, #6366f1, #10b981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     transition: all 0.3s ease;
+    margin-bottom: 10%;
+}
+
+.card-title{
+    margin-bottom: 1%;
+    padding-top: 8%;
 }
 
 header p {
-    font-size: 1rem;
+    font-size: 1.2rem;
     color: #4b5563;
-    transition: all 0.3s ease;
 }
 
-/* Botões Centralizados na Parte Inferior */
+/* Botões Centralizados e Verticalizados */
 .btn-container {
     display: flex;
+    flex-direction: column; /* Alinha os botões verticalmente */
     justify-content: center;
     align-items: center;
-    gap: 30px;
-    flex-wrap: wrap;
-    margin-top: auto; /* Faz com que os botões fiquem no final da tela */
-    margin-bottom: 50px; /* Espaçamento dos botões em relação ao rodapé */
+    gap: 20px; /* Espaçamento vertical entre os botões */
+    margin-top: 30px; /* Distância da seção acima */
 }
 
 /* Estilos dos Botões */
@@ -76,48 +89,63 @@ button {
     padding: 15px 30px;
     font-size: 1.1rem;
     font-weight: bold;
-    border-radius: 8px;
+    border-radius: 50px;
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-width: 220px;
-    max-width: 270px;
+    width: 100%;
+    max-width: 270px; /* Limita a largura dos botões */
     text-align: center;
-    transform: translateY(0);
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+button:hover::before {
+    left: 0;
+}
+
+button:hover {
+    transform: translateY(-5px);
 }
 
 /* Botões com Cores Diferentes */
 .btn1 {
-    background: #10b981; /* Verde */
-    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+    background: linear-gradient(90deg, #10b981, #34d399); /* Verde */
+    color: white;
 }
 
 .btn1:hover {
-    background: #059669;
     box-shadow: 0 5px 25px rgba(16, 185, 129, 0.5);
-    transform: translateY(-5px);
 }
 
 .btn2 {
-    background: #ef4444; /* Vermelho */
-    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+    background: linear-gradient(90deg, #ef4444, #f87171); /* Vermelho */
+    color: white;
 }
 
 .btn2:hover {
-    background: #dc2626;
     box-shadow: 0 5px 25px rgba(239, 68, 68, 0.5);
-    transform: translateY(-5px);
 }
 
 .btn3 {
-    background: #6366f1; /* Roxo */
-    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    background: linear-gradient(90deg, #6366f1, #818cf8); /* Roxo */
+    color: white;
 }
 
 .btn3:hover {
-    background: #4f46e5;
     box-shadow: 0 5px 25px rgba(99, 102, 241, 0.5);
-    transform: translateY(-5px);
 }
 
 /* Botão de Voltar */
@@ -125,9 +153,9 @@ button {
     padding: 15px 30px;
     font-size: 1.1rem;
     font-weight: bold;
-    border-radius: 8px;
+    border-radius: 50px;
     border: none;
-    background: #6366f1;
+    background: linear-gradient(90deg, #6366f1, #818cf8);
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -136,15 +164,30 @@ button {
 }
 
 .btn-back:hover {
-    background: #4f46e5;
     box-shadow: 0 5px 25px rgba(99, 102, 241, 0.5);
     transform: translateY(-5px);
+}
+
+/* Animação ao Carregar */
+.container {
+    animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
     header h1 {
-        font-size: 2rem;
+        font-size: 2.5rem;
     }
 
     header p {
@@ -152,26 +195,20 @@ button {
     }
 
     .btn-container {
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    button {
-        min-width: 80%;
-        max-width: 90%;
+        gap: 15px; /* Ajusta o espaçamento para telas menores */
     }
 }
 
 @media (max-width: 480px) {
     header h1 {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
 
-    .btn-back {
-        font-size: 1rem;
+    header p {
+        font-size: 0.9rem;
     }
 
-    button {
+    .btn-container button {
         padding: 12px 20px;
     }
 }

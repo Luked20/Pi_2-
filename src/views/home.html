@@ -18,7 +18,7 @@
                 <button id="createEventButton" onclick="goToCreateEvent()">Criar Evento</button>
                 <button id="walletButton" onclick="goToWallet()">Minha Wallet</button>
                 <button id="adminButton" onclick="goToAdminPage()">Admin</button> 
-                <button id="betButton" onclick="goToBettingPage()">Apostar</button> 
+                
             </div>
         </div>
         <div class="search-container">
@@ -34,40 +34,21 @@
             <button class="bet-button" onclick="window.location.href='allevents.html'">Apostar Aqui</button>
         </section>
         
-        <section class="categories">
-            <h2>Categorias Populares</h2>
-            <div class="category-card" onclick="goToCategory('esportes')">
-                <h3>Esportes</h3>
-            </div>
-            <div class="category-card" onclick="goToCategory('politica')">
-                <h3>Política</h3>
-            </div>
-            <div class="category-card" onclick="goToCategory('casino')">
-                <h3>Casino</h3>
-            </div>
-            <div class="category-card" onclick="goToCategory('outros')">
-                <h3>Outros</h3>
-            </div>
-        </section>
-
-        <div class="carousel">
-            <div class="carousel-track">
-                <div class="carousel-slide" style="background-image: url('quantum.png');"></div>
-                <div class="carousel-slide" style="background-image: url('quantum.png');"></div>
-                <div class="carousel-slide" style="background-image: url('quantum.png');"></div>
-            </div>
-            <div class="carousel-indicators">
-                <button class="active"></button>
-                <button></button>
-                <button></button>
-            </div>
-        </div>
+        
         
 
         <!-- Contêiner de resultados de busca -->
         <section id="searchResults" class="search-results">
             <div class="event-card" id="eventCard" style="display: none;">
-                <button class="close-btn" id="closeButton">&times;</button>
+                <!-- Botão para fechar o card -->
+                <button class="close-btn" id="closeButton" onclick="closeCard()">×</button>
+                
+                <!-- Conteúdo do card -->
+                <h3 id="eventTitle">Título do Evento</h3>
+                <p id="eventDescription">Descrição breve do evento...</p>
+                
+                <!-- Botão para redirecionar para a página de apostas -->
+                <button class="bet-button" onclick="goToBetPage()">Apostar</button>
             </div>
         </section>
     </main>
